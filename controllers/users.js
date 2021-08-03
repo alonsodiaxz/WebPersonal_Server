@@ -1,5 +1,10 @@
 const bcrypt = require("bcrypt-nodejs");
 const User = require("../models/user");
+const {
+  createAccessToken,
+  refreshAccessToken,
+  decodeToken,
+} = require("../services/jwt");
 
 function signUp(req, res) {
   const user = new User();
@@ -36,6 +41,8 @@ function signUp(req, res) {
                     "Usuario almacenado correctamente en la base de datos.",
                   user: userStored,
                 });
+                const token = createAccessToken(userStored);
+                const payload = decodeToken(token);
               }
             }
           });
