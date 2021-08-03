@@ -41,8 +41,6 @@ function signUp(req, res) {
                     "Usuario almacenado correctamente en la base de datos.",
                   user: userStored,
                 });
-                const token = createAccessToken(userStored);
-                const payload = decodeToken(token);
               }
             }
           });
@@ -52,6 +50,52 @@ function signUp(req, res) {
   }
 }
 
+function signIn(req, res) {
+  const params = req.body;
+  const email = params.email.toLowerCase();
+  const password = params.password;
+
+  //Buscar el usuario en la base de datos para ver que se ha registrado y darle un token
+  User.findOne({ email }, (err, userStored) => {
+    if (err) {
+      res.status(500).send({ message: "Error del servidor." });
+    } else {
+      if (!userStored) {
+        res.status(404).send({ message: "Usuario no encontrado." });
+      } else {
+        bcrypt.compare(password, userStored.password, (err, valid) => {
+          if (err) {
+            res.status(500).send({ message: "Error del servidor." });
+          } else {
+            if (valid) {
+              if (!userStored.active) {
+                res.status(200).send({
+                  code: 200,
+                  message: "El usuario no se ha activado.",
+                });
+              } else {
+                const accessToken = createAccessToken(userStored);
+                const refreshToken = refreshAccessToken(userStored);
+                res.status(200).send({
+                  code: 200,
+                  message: "",
+                  accessToken: `${accessToken}`,
+                  refreshToken: `${refreshToken}`,
+                });
+              }
+            } else {
+              res
+                .status(404)
+                .send({ message: "La contraseña introducida es incorrecta." });
+            }
+          }
+        });
+      }
+    }
+  });
+}
+
 module.exports = {
   signUp,
+  signIn,
 };
