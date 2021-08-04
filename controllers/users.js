@@ -6,6 +6,7 @@ const {
   decodeToken,
 } = require("../services/jwt");
 
+//Registrarse
 function signUp(req, res) {
   const user = new User();
   const { name, lastname, email, password, repeatPassword } = req.body;
@@ -50,6 +51,7 @@ function signUp(req, res) {
   }
 }
 
+//Logearse
 function signIn(req, res) {
   const params = req.body;
   const email = params.email.toLowerCase();
@@ -71,14 +73,14 @@ function signIn(req, res) {
               if (!userStored.active) {
                 res.status(200).send({
                   code: 200,
-                  message: "El usuario no se ha activado.",
+                  message: "El usuario no esta activado.",
                 });
               } else {
                 const accessToken = createAccessToken(userStored);
                 const refreshToken = refreshAccessToken(userStored);
                 res.status(200).send({
                   code: 200,
-                  message: "",
+                  message: "Usuario logeado con éxito.",
                   accessToken: `${accessToken}`,
                   refreshToken: `${refreshToken}`,
                 });
