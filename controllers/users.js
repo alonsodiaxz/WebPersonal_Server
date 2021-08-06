@@ -1,5 +1,6 @@
 const bcrypt = require("bcrypt-nodejs");
 const User = require("../models/user");
+//const { checkExpiredToken } = require("../controllers/auth");
 const {
   createAccessToken,
   refreshAccessToken,
@@ -78,6 +79,7 @@ function signIn(req, res) {
               } else {
                 const accessToken = createAccessToken(userStored);
                 const refreshToken = refreshAccessToken(userStored);
+                //checkExpiredToken(accessToken);
                 res.status(200).send({
                   code: 200,
                   message: "Usuario logeado con éxito.",
