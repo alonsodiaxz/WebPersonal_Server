@@ -98,9 +98,23 @@ function signIn(req, res) {
   });
 }
 
-//Obtener lista de usuarios de la base de datos
+//Obtener lista de usuarios registrados
 function getUsers(req, res) {
   User.find().then((users) => {
+    if (!users) {
+      res.status(404).send({ message: "No hay ningún usuario registrado." });
+    } else {
+      res.status(200).send({ message: "Usuarios encontrados", users });
+    }
+  });
+}
+
+//Obtener lista de usuarios activos registrados
+function getUsersActive(req, res) {
+  const query = req.query;
+
+  //User.find({ active: true }).then((users) => {
+  User.find({ active: query.active }).then((users) => {
     if (!users) {
       res.status(404).send({ message: "No hay ningún usuario registrado." });
     } else {
@@ -113,4 +127,5 @@ module.exports = {
   signUp,
   signIn,
   getUsers,
+  getUsersActive,
 };
