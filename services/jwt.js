@@ -1,7 +1,7 @@
 const jwt = require("jwt-simple");
 const moment = require("moment");
 
-const SECRET_KEY = "sdfddHEjAII7h588IIkkspQyHHWtalonso";
+const { SECRET_KEY } = require("../config");
 
 //Token de creación de usuario
 function createAccessToken(user) {
