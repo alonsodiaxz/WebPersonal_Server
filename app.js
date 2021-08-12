@@ -1,7 +1,9 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const cors = require("cors");
 
 const app = express();
+
 const { API_VERSION } = require("./config");
 
 //Load Routings
@@ -19,5 +21,6 @@ app.use(bodyParser.json());
 
 app.use(`/api/${API_VERSION}`, userRoutes);
 app.use(`/api/${API_VERSION}`, authRoutes);
+app.use(cors());
 
 module.exports = app;

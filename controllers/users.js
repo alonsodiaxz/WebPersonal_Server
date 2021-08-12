@@ -79,7 +79,6 @@ function signIn(req, res) {
               } else {
                 const accessToken = createAccessToken(userStored);
                 const refreshToken = refreshAccessToken(userStored);
-                //checkExpiredToken(accessToken);
                 res.status(200).send({
                   code: 200,
                   message: "Usuario logeado con éxito.",
@@ -99,7 +98,19 @@ function signIn(req, res) {
   });
 }
 
+//Obtener lista de usuarios de la base de datos
+function getUsers(req, res) {
+  User.find().then((users) => {
+    if (!users) {
+      res.status(404).send({ message: "No hay ningún usuario registrado." });
+    } else {
+      res.status(200).send({ message: "Usuarios encontrados", users });
+    }
+  });
+}
+
 module.exports = {
   signUp,
   signIn,
+  getUsers,
 };
