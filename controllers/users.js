@@ -123,9 +123,72 @@ function getUsersActive(req, res) {
   });
 }
 
+//Actualizar datos de un usuario de la base de datos.
+function updateUser(req, res) {
+  const user = new User();
+  const { name, lastname, email, password, repeatPassword, role } = req.body;
+  const id = req.user.id;
+  user.name = name;
+  user.lastname = lastname;
+  user.email = email.toLowerCase();
+  user.role = role;
+  user.active = false;
+
+  if ((password && !repeatPassword) || (!password && repeatPassword)) {
+    res
+      .status(404)
+      .send({ message: "La contraseña debe estar en ambos campos." });
+  } else {
+    if (password) {
+      if (password !== repeatPassword) {
+        res.status(404).send({ message: "Las contraseñas no son iguales." });
+      } else {
+        bcrypt.hash(password, null, null, function (err, hash) {
+          if (err) {
+            res
+              .status(500)
+              .send({ message: "Error al encriptar la contraseña." });
+          } else {
+            user.password = hash;
+
+            const updateDoc = {
+              $set: {
+                name: user.name,
+                lastname: user.lastname,
+                email: user.email,
+                role: user.role,
+                active: user.active,
+                password: user.password,
+              },
+            };
+            User.updateOne({ _id: id }, updateDoc, (err, changes) => {
+              if (err) {
+                res.status(500).send({ message: "Error de servidor." });
+              } else {
+                if (!changes) {
+                  res
+                    .status(404)
+                    .send({ message: "Error al actualizar el usuario." });
+                } else {
+                  res.status(200).send({
+                    message:
+                      "Usuario actualizado correctamente en la base de datos.",
+                    changes,
+                  });
+                }
+              }
+            });
+          }
+        });
+      }
+    }
+  }
+}
+
 module.exports = {
   signUp,
   signIn,
   getUsers,
   getUsersActive,
+  updateUser,
 };
