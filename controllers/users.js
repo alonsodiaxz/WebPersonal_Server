@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt-nodejs");
 const User = require("../models/user");
-//const { checkExpiredToken } = require("../controllers/auth");
+const fileSystem = require("fs");
+const path = require("path");
 const {
   createAccessToken,
   refreshAccessToken,
@@ -123,7 +124,7 @@ function getUsersActive(req, res) {
   });
 }
 
-//Actualizar datos de un usuario de la base de datos.
+//Actualizar datos de un usuario.
 function updateUser(req, res) {
   const user = new User();
   const { name, lastname, email, password, repeatPassword, role } = req.body;
@@ -150,39 +151,92 @@ function updateUser(req, res) {
               .send({ message: "Error al encriptar la contraseña." });
           } else {
             user.password = hash;
-
-            const updateDoc = {
-              $set: {
-                name: user.name,
-                lastname: user.lastname,
-                email: user.email,
-                role: user.role,
-                active: user.active,
-                password: user.password,
-              },
-            };
-            User.updateOne({ _id: id }, updateDoc, (err, changes) => {
-              if (err) {
-                res.status(500).send({ message: "Error de servidor." });
-              } else {
-                if (!changes) {
-                  res
-                    .status(404)
-                    .send({ message: "Error al actualizar el usuario." });
-                } else {
-                  res.status(200).send({
-                    message:
-                      "Usuario actualizado correctamente en la base de datos.",
-                    changes,
-                  });
-                }
-              }
-            });
           }
         });
       }
     }
+    const updateDoc = {
+      $set: {
+        name: user.name,
+        lastname: user.lastname,
+        email: user.email,
+        role: user.role,
+        active: user.active,
+        password: user.password,
+      },
+    };
+    User.updateOne({ _id: id }, updateDoc, (err, changes) => {
+      if (err) {
+        res.status(500).send({ message: "Error de servidor." });
+      } else {
+        if (!changes) {
+          res.status(404).send({ message: "Error al actualizar el usuario." });
+        } else {
+          res.status(200).send({
+            message: "Usuario actualizado correctamente en la base de datos.",
+            changes,
+          });
+        }
+      }
+    });
   }
+}
+
+//Actualizar avatar del usuario.
+function uploadAvatar(req, res) {
+  const params = req.params;
+  User.findById({ _id: params.id }, (err, userData) => {
+    if (err) {
+      res.status(500).send({ message: "Error del servidor." });
+    } else {
+      if (!userData) {
+        res
+          .status(404)
+          .send({ message: "No se ha encontrado ningún usuario." });
+      } else {
+        let user = userData;
+        if (req.files) {
+          let filePath = req.files.avatar.path;
+          let fileSplit = filePath.split("\\");
+          let fileName = fileSplit[6];
+
+          let extSplit = fileName.split(".");
+          let fileExt = extSplit[1];
+          console.log(fileExt);
+          if (fileExt !== "png" && fileExt !== "jpg") {
+            res.status(400).send({
+              message:
+                "La extensión de la imagen no es válida. (Extensiones permitidas .png y jpg)",
+            });
+          } else {
+            user.avatar = fileName;
+            User.findByIdAndUpdate(
+              { _id: params.id },
+              user,
+              (err, userResult) => {
+                if (err) {
+                  res.status(500).send({
+                    message: "Error del servidor.",
+                  });
+                } else {
+                  if (!userResult) {
+                    res.status(404).send({
+                      message: "Usuario no actualizado.",
+                    });
+                  } else {
+                    res.status(200).send({
+                      message: "Usuario actualizado.",
+                      avatarName: fileName,
+                    });
+                  }
+                }
+              }
+            );
+          }
+        }
+      }
+    }
+  });
 }
 
 module.exports = {
@@ -191,4 +245,5 @@ module.exports = {
   getUsers,
   getUsersActive,
   updateUser,
+  uploadAvatar,
 };
