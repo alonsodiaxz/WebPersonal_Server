@@ -22,7 +22,7 @@ api.post("/sign-up", signUp);
 api.post("/sign-in", signIn);
 api.get("/users", [md_auth.ensureAuth], getUsers);
 api.get("/users-active", [md_auth.ensureAuth], getUsersActive);
-api.put("/update-user", [md_auth.ensureAuth], updateUser);
+api.put("/update-user/:id", [md_auth.ensureAuth], updateUser);
 api.put(
   "/upload-avatar/:id",
   [md_auth.ensureAuth, md_upload_avatar],
