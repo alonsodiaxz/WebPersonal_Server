@@ -16,6 +16,7 @@ const {
   updateUser,
   uploadAvatar,
   getAvatar,
+  activateUser,
 } = UserController;
 
 api.post("/sign-up", signUp);
@@ -29,5 +30,6 @@ api.put(
   uploadAvatar
 );
 api.get("/get-avatar/:avatarName", getAvatar);
+api.put("/activate-user/:id", [md_auth.ensureAuth], activateUser);
 
 module.exports = api;
