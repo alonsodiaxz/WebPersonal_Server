@@ -253,6 +253,22 @@ function activateUser(req, res) {
   });
 }
 
+//Eliminar usuarios
+function deleteUser(req, res) {
+  const { id } = req.params;
+  User.findByIdAndDelete({ _id: id }, (err, userStored) => {
+    if (err) {
+      res.status(500).send({ message: "Error del servidor." });
+    } else {
+      if (!userStored) {
+        res.status(404).send({ message: "Usuario no encontrado." });
+      } else {
+        res.status(200).send({ message: "Usuario eliminado." });
+      }
+    }
+  });
+}
+
 module.exports = {
   signUp,
   signIn,
@@ -262,4 +278,5 @@ module.exports = {
   uploadAvatar,
   getAvatar,
   activateUser,
+  deleteUser,
 };
