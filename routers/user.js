@@ -18,6 +18,7 @@ const {
   getAvatar,
   activateUser,
   deleteUser,
+  signUpAdmin,
 } = UserController;
 
 api.post("/sign-up", signUp);
@@ -33,5 +34,6 @@ api.put(
 api.get("/get-avatar/:avatarName", getAvatar);
 api.put("/activate-user/:id", [md_auth.ensureAuth], activateUser);
 api.delete("/delete-user/:id", [md_auth.ensureAuth], deleteUser);
+api.post("/sign-up-admin", [md_auth.ensureAuth], signUpAdmin);
 
 module.exports = api;
