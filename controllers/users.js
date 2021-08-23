@@ -272,8 +272,7 @@ function deleteUser(req, res) {
 //Añadir usuario desde el panel de adminsitrador
 function signUpAdmin(req, res) {
   const user = User();
-  const { name, lastname, password, repeatPassword, email, role, active } =
-    req.body;
+  const { name, lastname, password, repeatPassword, email, role } = req.body;
   user.name = name;
   user.lastname = lastname;
   user.email = email.toLowerCase();
