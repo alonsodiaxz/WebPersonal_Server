@@ -21,6 +21,23 @@ function addMenu(req, res) {
   });
 }
 
+function getMenus(req, res) {
+  Menu.find()
+    .sort({ order: "asc" })
+    .exec((err, menus) => {
+      if (err) {
+        res.status(500).send({ message: "Error de servidor." });
+      } else {
+        if (!menus) {
+          res.status(404).send({ message: "Ningun menu almacenado." });
+        } else {
+          res.status(200).send({ menus });
+        }
+      }
+    });
+}
+
 module.exports = {
   addMenu,
+  getMenus,
 };
